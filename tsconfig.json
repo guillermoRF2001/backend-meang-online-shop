@@ -2,6 +2,14 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
+    "paths":{
+      "@shop/*":["src/app/@public/*"],
+      "@admin/*":["src/app/@admin/*"],
+      "@admin-core/*":["src/app/@admin/core/*"],
+      "@admin-pages/*":["src/app/@admin/pages/*"],
+      "@shop-core/*":["src/app/@public/core/*"],
+      "@shop-pages/*":["src/app/@public/pages/*"],
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
