@@ -19,7 +19,6 @@ export class LoginComponent {
   constructor(private auth: AuthService, private router: Router) { }
 
   init() {
-    console.log(this.login);
     // tslint:disable-next-line: deprecation
     this.auth.login(this.login.email, this.login.password).subscribe(
       (result: IResultLogin) => {

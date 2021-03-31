@@ -35,7 +35,6 @@ export class RegisterComponent implements OnInit {
   }
 
   add(){
-    console.log('Enviando datos.', this.register);
     // tslint:disable-next-line: deprecation
     this.api.register(this.register).subscribe((result: IResultRegister) => {
       console.log('Result', result);
