@@ -9,6 +9,10 @@
       "@admin-pages/*":["src/app/@admin/pages/*"],
       "@shop-core/*":["src/app/@public/core/*"],
       "@shop-pages/*":["src/app/@public/pages/*"],
+      "@graphql/*":["src/app/@graphql/*"],
+      "@core/*":["src/app/@core/*"],
+      "@shared/*":["src/app/@shared/*"],
+
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
