@@ -1,3 +1,4 @@
+import { RESULT_INFO_FRAGMENT } from '@graphql/operations/fragment/result-info';
 import { USER_FRAGMENT } from '@graphql/operations/fragment/user';
 import gql from 'graphql-tag';
 
@@ -18,8 +19,11 @@ export const LOGIN_QUERY = gql`
 
 // Graphql users.
 export const USERS_LIST_QUERY = gql`
-    query usersList($include: Boolean!){
-        users{
+    query usersList($include: Boolean!, $page: Int, $itemsPage: Int){
+        users(page: $page, itemsPage: $itemsPage){
+            info{
+                ...ResultInfoObject
+            }
             status
             message
             users {
@@ -28,6 +32,7 @@ export const USERS_LIST_QUERY = gql`
         }
     }
     ${ USER_FRAGMENT }
+    ${ RESULT_INFO_FRAGMENT }
 `;
 
 // Graphql me.

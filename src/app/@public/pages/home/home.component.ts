@@ -13,12 +13,12 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     // Imformacion que aparece en la consola sobre todos los usuarios y mas.
-    /*
+
     // tslint:disable-next-line: deprecation
     this.usersApi.getUsers().subscribe( result => {
       console.log('getUsers -', result); // { status message users: []}
     });
-
+/*
     // tslint:disable-next-line: deprecation
     this.auth.getMe().subscribe( result => {
       console.log('getMe -', result); // { status message user: {}}}
