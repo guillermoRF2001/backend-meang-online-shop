@@ -11,5 +11,4 @@ export class AdminComponent {
   toggled($event) {
     this.toggledValue = $event;
   }
-
 }

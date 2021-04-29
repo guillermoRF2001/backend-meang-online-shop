@@ -12,6 +12,7 @@ import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
 import { UsersAdminService } from './users-admin.service';
 import { IRegisterForm } from '@core/interfaces/register.interface';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-users',
@@ -26,7 +27,7 @@ export class UsersComponent implements OnInit {
   include: boolean;
   columns: Array<ITableColumns>;
 
-  constructor(private service: UsersAdminService) {}
+  constructor(private service: UsersAdminService, private router: Router) {}
 
   ngOnInit(): void {
     this.context = {};
@@ -193,6 +194,7 @@ export class UsersComponent implements OnInit {
     this.service.block(id).subscribe((res: any) => {
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
+        this.router.navigate(['admin/tags']);
         return;
       }
       basicAlert(TYPE_ALERT.WARNING, res.message);

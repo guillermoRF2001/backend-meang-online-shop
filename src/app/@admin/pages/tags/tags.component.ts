@@ -1,35 +1,36 @@
-import { basicAlert } from '@shared/alerts/toasts';
-import { GenresService } from './genres.service';
-import { ITableColumns } from '@core/interfaces/table-columns.interface';
-import { GENRE_LIST_QUERY } from '@graphql/operations/query/genre';
+import { TAG_LIST_QUERY } from '@graphql/operations/query/tag';
 import { Component, OnInit } from '@angular/core';
-import { IResultData } from '@core/interfaces/result-data.interface';
+import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import { DocumentNode } from 'graphql';
-import { formBasicDialog, optionsWithDetails } from '@shared/alerts/alerts';
+import { IResultData } from '@core/interfaces/result-data.interface';
+import { TagsService } from './tags.service';
+import { optionsWithDetails, formBasicDialog } from '@shared/alerts/alerts';
+import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-genres',
-  templateUrl: './genres.component.html',
-  styleUrls: ['./genres.component.scss'],
+  selector: 'app-tags',
+  templateUrl: './tags.component.html',
+  styleUrls: ['./tags.component.scss']
 })
-export class GenresComponent implements OnInit {
-  query: DocumentNode = GENRE_LIST_QUERY;
+export class TagsComponent implements OnInit {
+
+  query: DocumentNode = TAG_LIST_QUERY;
   context: object;
   itemsPage: number;
   resultData: IResultData;
   include: boolean;
   columns: Array<ITableColumns>;
 
-  constructor(private service: GenresService, private router: Router) {}
+  constructor(private service: TagsService, private router: Router) {}
 
   ngOnInit(): void {
     this.context = {};
     this.itemsPage = 15;
     this.resultData = {
-      listKey: 'genres',
-      definitionKey: 'genres',
+      listKey: 'tags',
+      definitionKey: 'tags',
     };
     this.include = false;
     this.columns = [
@@ -39,68 +40,59 @@ export class GenresComponent implements OnInit {
       },
       {
         property: 'name',
-        label: 'Nombre del género',
+        label: 'Tag',
       },
       {
         property: 'slug',
-        label: 'slug',
+        label: 'Slug',
       },
     ];
   }
-
   async takeAction($event) {
-    // Coger la informacion para las acciones.
+    // Coger la información para las acciones
     const action = $event[0];
-    const genre = $event[1];
-    // Cogemos el valor por defecto.
+    const tag = $event[1];
+    // Cogemos el valor por defecto
     const defaultValue =
-      genre.name !== undefined && genre.name !== '' ? genre.name : '';
+      tag.name !== undefined && tag.name !== '' ? tag.name : '';
     const html = `<input id="name" value="${defaultValue}" class="swal2-input" required>`;
-    // Teniendo en cuenta el caso, ejecutar una acción.
+    // Teniendo en cuenta el caso, ejecutar una acción
     switch (action) {
       case 'add':
         // Añadir el item
         this.addForm(html);
         break;
-
       case 'edit':
-        // Editar el item
-        this.updateForm(html, genre);
+        this.updateForm(html, tag);
         break;
-
       case 'info':
-        // Informacion del item
         const result = await optionsWithDetails(
           'Detalles',
-          `Name: ${genre.name}<br/>
-          Slug: ${genre.slug}`,
+          `Name: ${tag.name}<br/>
+          Slug: ${tag.slug}`,
           400,
           '<i class="bx bxs-edit" style="color: #ffffff"></i> Editar', // true
           '<i class="bx bxs-lock-alt" style="color:#ffffff" ></i> Bloquear' // false
         );
         if (result === true) {
-          this.updateForm(html, genre);
+          this.updateForm(html, tag);
         } else if (result === false) {
-          this.blockForm(genre);
+          this.blockForm(tag);
         }
         break;
-
       case 'block':
-        // Bloquear el item
-        this.blockForm(genre);
+        this.blockForm(tag);
         break;
-
       default:
         break;
     }
   }
-
   private async addForm(html: string) {
-    const result = await formBasicDialog('Añadir género', html, 'name');
-    this.addGenre(result);
+    const result = await formBasicDialog('Añadir tag', html, 'name');
+    this.addtag(result);
   }
 
-  addGenre(result) {
+  private addtag(result) {
     if (result.value) {
       // tslint:disable-next-line: deprecation
       this.service.add(result.value).subscribe((res: any) => {
@@ -113,12 +105,12 @@ export class GenresComponent implements OnInit {
     }
   }
 
-  async updateForm(html: string, genre: any) {
-    const result = await formBasicDialog('Modificar género', html, 'name');
-    this.updateGenre(genre.id, result);
+  private async updateForm(html: string, tag: any) {
+    const result = await formBasicDialog('Modificar tag', html, 'name');
+    this.updateTag(tag.id, result);
   }
 
-  updateGenre(id: string, result) {
+  private updateTag(id: string, result) {
     if (result.value) {
       // tslint:disable-next-line: deprecation
       this.service.update(id, result.value).subscribe((res: any) => {
@@ -131,31 +123,30 @@ export class GenresComponent implements OnInit {
     }
   }
 
-  async blockForm(genre: any) {
-    const result = await optionsWithDetails(
-      '¿Estas seguro que quieres bloquearlo?',
-      `Si bloqueas el genero ${genre.name}, no se volvera a mostrar en la lista.`,
-      400,
-      '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
-      '<i class="bx bxs-lock-alt" style="color:#ffffff"></i> Bloquear'
-    );
-    if (result === false) {
-      // Si el resultado es falso, queremos bloquear.
-      this.blockGenre(genre.id);
-    } else {
-      basicAlert(TYPE_ALERT.INFO, 'Operación cancelada');
-    }
-  }
-
-  blockGenre(id: string) {
+  private blockTag(id: string) {
     // tslint:disable-next-line: deprecation
     this.service.block(id).subscribe((res: any) => {
       if (res.status) {
+        this.router.navigate(['admin/tags']);
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
-        this.router.navigate(['admin/genres']);
         return;
       }
       basicAlert(TYPE_ALERT.WARNING, res.message);
     });
   }
+
+  private async blockForm(tag: any) {
+    const result = await optionsWithDetails(
+      '¿Bloquear?',
+      `Si bloqueas el item seleccionado, no se mostrará en la lista`,
+      430,
+      'No, no bloquear',
+      'Si, bloquear'
+    );
+    if (result === false) {
+      // Si resultado falso, queremos bloquear
+      this.blockTag(tag.id);
+    }
+  }
+
 }
