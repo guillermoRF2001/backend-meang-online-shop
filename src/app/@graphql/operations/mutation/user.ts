@@ -15,7 +15,7 @@ export const REGISTER_USER = gql`
 `;
 
 export const UPDATE_USER = gql`
-  mutation modificarUsusario($user: UserInput!, $include: Boolean!) {
+  mutation updateUser($user: UserInput!, $include: Boolean!) {
     updateUser(user: $user) {
       status
       message
@@ -28,8 +28,17 @@ export const UPDATE_USER = gql`
 `;
 
 export const BLOCK_USER = gql`
-  mutation blockearUsuario($id: ID!) {
-    blockUser(id: $id) {
+  mutation blockUser($id: ID!, $unblock: Boolean, $admin: Boolean) {
+    blockUser(id: $id, unblock: $unblock, admin: $admin) {
+      status
+      message
+    }
+  }
+`;
+
+export const ACTIVE_EMAIL_USER = gql`
+  mutation activeUserEmail($id: ID!, $email: String!) {
+    activeUserEmail(id: $id, email: $email) {
       status
       message
     }

@@ -4,7 +4,6 @@ import { IResultData } from '@core/interfaces/result-data.interface';
 import { DocumentNode } from 'graphql';
 import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import {
-  formBasicDialog,
   optionsWithDetails,
   userFormBasicDialog,
 } from '@shared/alerts/alerts';
@@ -12,7 +11,7 @@ import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
 import { UsersAdminService } from './users-admin.service';
 import { IRegisterForm } from '@core/interfaces/register.interface';
-import { Router } from '@angular/router';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 
 @Component({
   selector: 'app-users',
@@ -26,8 +25,9 @@ export class UsersComponent implements OnInit {
   resultData: IResultData;
   include: boolean;
   columns: Array<ITableColumns>;
+  filterActiveValues = ACTIVE_FILTERS.ACTIVE;
 
-  constructor(private service: UsersAdminService, private router: Router) {}
+  constructor(private service: UsersAdminService) {}
 
   ngOnInit(): void {
     this.context = {};
@@ -57,6 +57,10 @@ export class UsersComponent implements OnInit {
       {
         property: 'role',
         label: 'Permisos',
+      },
+      {
+        property: 'active',
+        label: '¿Activo?',
       },
     ];
   }
@@ -108,21 +112,33 @@ export class UsersComponent implements OnInit {
           'Detalles',
           `<i class="fas fa-circle"></i>&nbsp;&nbsp;${user.name} ${user.lastname}<br/>
           <i class="bx bxs-envelope" style="background-color:blue; color: #ffffff"></i>&nbsp;&nbsp;${user.email}<br/>
+          <i class='bx bxs-cake' style='color:#9a12f7; font-size: 20px'></i>&nbsp;&nbsp;${user.birthday}<br/>
           <i class="fas fa-user-circle"></i>&nbsp;&nbsp;${user.role}`,
           400,
-          '<i class="bx bxs-edit" style="color: #ffffff"></i> Editar', // true
-          '<i class="bx bxs-lock-alt" style="color:#ffffff" ></i> Bloquear' // false
+          '<i class="bx bxs-edit" style="color: #ffffff; font-size: 20px"></i> Editar', // true
+          (user.active !== false) ?
+          '<i class="bx bxs-lock-alt" style="color:#ffffff; font-size: 20px"></i> Bloquear' :
+          '<i class="bx bxs-lock-open-alt" style="color:#ffffff; font-size: 20px"></i> Desbloquear'
+          // false
         );
         if (result === true) {
           this.updateForm(html, user);
         } else if (result === false) {
-          this.blockForm(user);
+          if (user.active !== false) {
+            this.unblockForm(user, false);
+          } else {
+            this.unblockForm(user, true);
+          }
         }
         break;
 
       case 'block':
         // Bloquear el item
-        this.blockForm(user);
+        this.unblockForm(user, false);
+        break;
+      case 'unblock':
+        // Desbloquear el item
+        this.unblockForm(user, true);
         break;
 
       default:
@@ -132,7 +148,6 @@ export class UsersComponent implements OnInit {
 
   private async addForm(html: string) {
     const result = await userFormBasicDialog('Añadir Usuario', html);
-    console.log(result);
     this.addUser(result);
   }
 
@@ -144,7 +159,14 @@ export class UsersComponent implements OnInit {
       // tslint:disable-next-line: deprecation
       this.service.register(user).subscribe((res: any) => {
         if (res.status) {
-          basicAlert(TYPE_ALERT.SUCCESS, res.message);
+          // tslint:disable-next-line: deprecation
+          this.service.sendEmailActive(res.user.id, user.email).subscribe(
+            resEmail => {
+              (resEmail.status) ?
+              basicAlert(TYPE_ALERT.SUCCESS, resEmail.message) :
+              basicAlert(TYPE_ALERT.SUCCESS, resEmail.message);
+            }
+          );
           return;
         }
         basicAlert(TYPE_ALERT.WARNING, res.message);
@@ -153,9 +175,13 @@ export class UsersComponent implements OnInit {
   }
 
   private async updateForm(html: string, user: any) {
-    const result = await userFormBasicDialog('Modificar usuario', html);
-    console.log(result);
-    this.updateUser(result, user.id);
+    if (user.active !== false) {
+      const result = await userFormBasicDialog('Modificar usuario', html);
+      this.updateUser(result, user.id);
+    } else {
+      basicAlert(TYPE_ALERT.ERROR, 'El usuario esta bloqueado. Para poder modificarlo debe desbloquearlo primero.');
+      return;
+    }
   }
 
   private updateUser(result, id: string) {
@@ -173,28 +199,35 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  async blockForm(user: any) {
-    const result = await optionsWithDetails(
-      '¿Estas seguro que quieres bloquearlo?',
-      `Si eliminas el usuario ${user.name}, no se volvera a mostrar en la lista.`,
+  async unblockForm(user: any, unblock: boolean) {
+    const result = (unblock) ?
+    await optionsWithDetails(
+      '¿Desbloquear?',
+      `Si desbloqueas el usuario ${user.name}, se volvera a mostrar en la lista.`,
+      400,
+      '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
+      '<i class="bx bxs-lock-open-alt" style="color:#ffffff"></i> Desbloquear'
+    ) :
+    await optionsWithDetails(
+      '¿Bloquear?',
+      `Si bloqueas el usuario ${user.name}, no se volvera a mostrar en la lista.`,
       400,
       '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
       '<i class="bx bxs-lock-alt" style="color:#ffffff"></i> Bloquear'
     );
     if (result === false) {
       // Si el resultado es falso, queremos bloquear.
-      this.blockUser(user.id);
+      this.unblockUser(user.id, unblock, true);
     } else {
       basicAlert(TYPE_ALERT.INFO, 'Operación cancelada');
     }
   }
 
-  blockUser(id: string) {
+  private unblockUser(id: string, unblock: boolean = false, admin: boolean = false) {
     // tslint:disable-next-line: deprecation
-    this.service.block(id).subscribe((res: any) => {
+    this.service.unblock(id, unblock, admin).subscribe((res: any) => {
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
-        this.router.navigate(['admin/tags']);
         return;
       }
       basicAlert(TYPE_ALERT.WARNING, res.message);

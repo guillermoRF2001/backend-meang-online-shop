@@ -152,7 +152,7 @@ export class GenresComponent implements OnInit {
     this.service.block(id).subscribe((res: any) => {
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
-        this.router.navigate(['admin/genres']);
+        window.location.reload();
         return;
       }
       basicAlert(TYPE_ALERT.WARNING, res.message);
