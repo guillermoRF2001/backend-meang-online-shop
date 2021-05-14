@@ -110,7 +110,8 @@ export class UsersComponent implements OnInit {
         // Informacion del item
         const result = await optionsWithDetails(
           'Detalles',
-          `<i class="fas fa-circle"></i>&nbsp;&nbsp;${user.name} ${user.lastname}<br/>
+          `<i class='bx bx-id-card' style= 'font-size: 20px'></i>&nbsp;&nbsp;ID :  ${user.id}<br/>
+          <i class="fas fa-circle"></i>&nbsp;&nbsp;${user.name} ${user.lastname}<br/>
           <i class="bx bxs-envelope" style="background-color:blue; color: #ffffff"></i>&nbsp;&nbsp;${user.email}<br/>
           <i class='bx bxs-cake' style='color:#9a12f7; font-size: 20px'></i>&nbsp;&nbsp;${user.birthday}<br/>
           <i class="fas fa-user-circle"></i>&nbsp;&nbsp;${user.role}`,

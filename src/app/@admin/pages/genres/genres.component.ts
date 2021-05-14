@@ -1,13 +1,13 @@
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 import { basicAlert } from '@shared/alerts/toasts';
-import { GenresService } from './genres.service';
-import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import { GENRE_LIST_QUERY } from '@graphql/operations/query/genre';
 import { Component, OnInit } from '@angular/core';
-import { IResultData } from '@core/interfaces/result-data.interface';
 import { DocumentNode } from 'graphql';
+import { IResultData } from '@core/interfaces/result-data.interface';
+import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import { formBasicDialog, optionsWithDetails } from '@shared/alerts/alerts';
+import { GenresService } from './genres.service';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-genres',
@@ -21,8 +21,9 @@ export class GenresComponent implements OnInit {
   resultData: IResultData;
   include: boolean;
   columns: Array<ITableColumns>;
+  filterActiveValues = ACTIVE_FILTERS.ACTIVE;
 
-  constructor(private service: GenresService, private router: Router) {}
+  constructor(private service: GenresService) {}
 
   ngOnInit(): void {
     this.context = {};
@@ -44,6 +45,10 @@ export class GenresComponent implements OnInit {
       {
         property: 'slug',
         label: 'slug',
+      },
+      {
+        property: 'active',
+        label: '¿Activo?',
       },
     ];
   }
@@ -76,19 +81,25 @@ export class GenresComponent implements OnInit {
           Slug: ${genre.slug}`,
           400,
           '<i class="bx bxs-edit" style="color: #ffffff"></i> Editar', // true
-          '<i class="bx bxs-lock-alt" style="color:#ffffff" ></i> Bloquear' // false
+          genre.active !== false ?
+          '<i class="bx bxs-lock-alt" style="color:#ffffff" ></i> Bloquear' :
+          '<i class="bx bxs-lock-open-alt" style="color:#ffffff" ></i> Desbloquear'
         );
         if (result === true) {
           this.updateForm(html, genre);
         } else if (result === false) {
-          this.blockForm(genre);
+          this.unblockForm(genre, (genre.active !== false) ? false : true);
         }
         break;
 
-      case 'block':
-        // Bloquear el item
-        this.blockForm(genre);
-        break;
+        case 'block':
+          // Bloquear el item
+          this.unblockForm(genre, false);
+          break;
+        case 'unblock':
+          // Desbloquear el item
+          this.unblockForm(genre, true);
+          break;
 
       default:
         break;
@@ -100,7 +111,7 @@ export class GenresComponent implements OnInit {
     this.addGenre(result);
   }
 
-  addGenre(result) {
+  private addGenre(result) {
     if (result.value) {
       // tslint:disable-next-line: deprecation
       this.service.add(result.value).subscribe((res: any) => {
@@ -113,12 +124,17 @@ export class GenresComponent implements OnInit {
     }
   }
 
-  async updateForm(html: string, genre: any) {
-    const result = await formBasicDialog('Modificar género', html, 'name');
-    this.updateGenre(genre.id, result);
+  private async updateForm(html: string, genre: any) {
+    if (genre.active !== false) {
+      const result = await formBasicDialog('Modificar género', html, 'name');
+      this.updateGenre(genre.id, result);
+    } else {
+      basicAlert(TYPE_ALERT.ERROR, 'El genero esta bloqueado. Para poder modificarlo debe desbloquearlo primero.');
+      return;
+    }
   }
 
-  updateGenre(id: string, result) {
+  private updateGenre(id: string, result) {
     if (result.value) {
       // tslint:disable-next-line: deprecation
       this.service.update(id, result.value).subscribe((res: any) => {
@@ -131,28 +147,35 @@ export class GenresComponent implements OnInit {
     }
   }
 
-  async blockForm(genre: any) {
-    const result = await optionsWithDetails(
-      '¿Estas seguro que quieres bloquearlo?',
-      `Si bloqueas el genero ${genre.name}, no se volvera a mostrar en la lista.`,
+  private async unblockForm(genre: any, unblock: boolean) {
+    const result = unblock ?
+    await optionsWithDetails(
+      '¿Desbloquear?',
+      `Si desbloqueas el usuario ${genre.name}, se volvera a mostrar en la lista.`,
+      400,
+      '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
+      '<i class="bx bxs-lock-open-alt" style="color:#ffffff"></i> Desbloquear'
+    ) :
+    await optionsWithDetails(
+      '¿Bloquear?',
+      `Si bloqueas el usuario ${genre.name}, no se volvera a mostrar en la lista.`,
       400,
       '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
       '<i class="bx bxs-lock-alt" style="color:#ffffff"></i> Bloquear'
     );
     if (result === false) {
       // Si el resultado es falso, queremos bloquear.
-      this.blockGenre(genre.id);
+      this.blockGenre(genre.id, unblock);
     } else {
       basicAlert(TYPE_ALERT.INFO, 'Operación cancelada');
     }
   }
 
-  blockGenre(id: string) {
+  blockGenre(id: string, unblock: boolean) {
     // tslint:disable-next-line: deprecation
-    this.service.block(id).subscribe((res: any) => {
+    this.service.unblock(id, unblock).subscribe((res: any) => {
       if (res.status) {
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
-        window.location.reload();
         return;
       }
       basicAlert(TYPE_ALERT.WARNING, res.message);

@@ -34,11 +34,12 @@ export class GenresService extends ApiService {
       }));
   }
 
-  block(id: string) {
+  unblock(id: string, unblock: boolean) {
     return this.set(
       BLOCK_GENRE,
       {
         id,
+        unblock
       }, {}).pipe(map((result: any) => {
         return result.blockGenre;
       }));

@@ -1,5 +1,5 @@
-import { PublicModule } from './@public/pages/public.module';
-import { AdminModule } from './@admin/pages/admin.module';
+import { PublicModule } from '@shop/pages/public.module';
+import { AdminModule } from '@admin/pages/admin.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
@@ -9,7 +9,7 @@ import { GraphqlModule } from '@graphql/modules/graphql.module';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,

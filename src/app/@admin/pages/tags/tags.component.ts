@@ -7,7 +7,7 @@ import { TagsService } from './tags.service';
 import { optionsWithDetails, formBasicDialog } from '@shared/alerts/alerts';
 import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
-import { Router } from '@angular/router';
+import { ACTIVE_FILTERS } from '@core/constants/filters';
 
 @Component({
   selector: 'app-tags',
@@ -22,8 +22,9 @@ export class TagsComponent implements OnInit {
   resultData: IResultData;
   include: boolean;
   columns: Array<ITableColumns>;
+  filterActiveValues = ACTIVE_FILTERS.ACTIVE;
 
-  constructor(private service: TagsService, private router: Router) {}
+  constructor(private service: TagsService) {}
 
   ngOnInit(): void {
     this.context = {};
@@ -45,6 +46,10 @@ export class TagsComponent implements OnInit {
       {
         property: 'slug',
         label: 'Slug',
+      },
+      {
+        property: 'active',
+        label: '¿Activo?',
       },
     ];
   }
@@ -72,19 +77,25 @@ export class TagsComponent implements OnInit {
           Slug: ${tag.slug}`,
           400,
           '<i class="bx bxs-edit" style="color: #ffffff"></i> Editar', // true
-          '<i class="bx bxs-lock-alt" style="color:#ffffff" ></i> Bloquear' // false
+          (tag.active !== false) ?
+          '<i class="bx bxs-lock-alt" style="color:#ffffff; font-size: 20px"></i> Bloquear' :
+          '<i class="bx bxs-lock-open-alt" style="color:#ffffff; font-size: 20px"></i> Desbloquear'
+          // false
         );
         if (result === true) {
           this.updateForm(html, tag);
         } else if (result === false) {
-          this.blockForm(tag);
+          this.unblockForm(tag, tag.active !== false ? false : true);
         }
         break;
-      case 'block':
-        this.blockForm(tag);
-        break;
-      default:
-        break;
+        case 'block':
+          this.unblockForm(tag, false);
+          break;
+        case 'unblock':
+          this.unblockForm(tag, true);
+          break;
+        default:
+          break;
     }
   }
   private async addForm(html: string) {
@@ -106,8 +117,13 @@ export class TagsComponent implements OnInit {
   }
 
   private async updateForm(html: string, tag: any) {
-    const result = await formBasicDialog('Modificar tag', html, 'name');
-    this.updateTag(tag.id, result);
+    if (tag.active !== false) {
+      const result = await formBasicDialog('Modificar tag', html, 'name');
+      this.updateTag(tag.id, result);
+  } else {
+      basicAlert(TYPE_ALERT.ERROR, 'El tag esta bloqueado. Para poder modificarlo debe desbloquearlo primero.');
+      return;
+  }
   }
 
   private updateTag(id: string, result) {
@@ -123,11 +139,10 @@ export class TagsComponent implements OnInit {
     }
   }
 
-  private blockTag(id: string) {
+  private unblockTag(id: string, unblock: boolean) {
     // tslint:disable-next-line: deprecation
-    this.service.block(id).subscribe((res: any) => {
+    this.service.unblock(id, unblock).subscribe((res: any) => {
       if (res.status) {
-        this.router.navigate(['admin/tags']);
         basicAlert(TYPE_ALERT.SUCCESS, res.message);
         return;
       }
@@ -135,17 +150,25 @@ export class TagsComponent implements OnInit {
     });
   }
 
-  private async blockForm(tag: any) {
-    const result = await optionsWithDetails(
+  private async unblockForm(tag: any, unblock: boolean) {
+    const result = unblock ?
+    await optionsWithDetails(
+      '¿Desbloquear?',
+      `Si desbloqueas el usuario ${tag.name}, se volvera a mostrar en la lista.`,
+      400,
+      '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
+      '<i class="bx bxs-lock-open-alt" style="color:#ffffff"></i> Desbloquear'
+    ) :
+    await optionsWithDetails(
       '¿Bloquear?',
-      `Si bloqueas el item seleccionado, no se mostrará en la lista`,
-      430,
-      'No, no bloquear',
-      'Si, bloquear'
+      `Si bloqueas el usuario ${tag.name}, no se volvera a mostrar en la lista.`,
+      400,
+      '<i class="bx bx-x-circle" style="color:#ffffff"></i> Cancelar',
+      '<i class="bx bxs-lock-alt" style="color:#ffffff"></i> Bloquear'
     );
     if (result === false) {
       // Si resultado falso, queremos bloquear
-      this.blockTag(tag.id);
+      this.unblockTag(tag.id, unblock);
     }
   }
 
