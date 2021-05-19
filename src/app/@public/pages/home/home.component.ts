@@ -1,3 +1,5 @@
+import { closeAlert } from './../../../@shared/alerts/alerts';
+import { loadData } from '@shared/alerts/alerts';
 import { ProductsService } from '@core/services/products.service';
 import { Component, OnInit } from '@angular/core';
 import { ICarouselItem } from '@mugan86/ng-shop-ui/lib/interfaces/carousel-item.interface';
@@ -14,45 +16,36 @@ export class HomeComponent implements OnInit {
   listOne;
   listTwo;
   listThree;
+  listFour;
+  loading: boolean;
   constructor(private products: ProductsService) { }
 
   ngOnInit(): void {
-    this.products.getByLastUnitsOffers(
-      1, 4, ACTIVE_FILTERS.ACTIVE,
-      true, 35, 40
-    ).subscribe(result => {
-      console.log('Productos a menos de 35', result);
-      this.listThree = result;
+    this.loading = true;
+    loadData('Cargando datos', 'Espere por favor');
+    this.products.getHomePage().subscribe( data => {
+      console.log(data);
+      this.listOne = data.ps3;
+      this.listTwo = data.pc;
+      this.listThree = data.topPrice;
+      this.listFour = data.android;
+      this.items = this.manageCarousel(data.carousel);
+      closeAlert();
+      this.loading = false;
     });
+  }
 
-    this.products.getByPlatform(
-      1, 4, ACTIVE_FILTERS.ACTIVE,
-      true, '18'
-    ).subscribe(result => {
-      console.log('Productos de ps4', result);
-      this.listOne = result;
+  private manageCarousel(list) {
+    const itemsValues: Array<ICarouselItem> = [];
+    list.shopProducts.map((item) => {
+      itemsValues.push({
+        id: item.id,
+        title: item.product.name,
+        description: item.platform.name,
+        background: item.product.img,
+        url: ''
+      });
     });
-
-    this.products.getByPlatform(
-      1, 4, ACTIVE_FILTERS.ACTIVE,
-      true, '4'
-    ).subscribe(result => {
-      console.log('products pc', result);
-      this.listTwo = result;
-    });
-
-    this.products.getByLastUnitsOffers(
-      1, 6, ACTIVE_FILTERS.ACTIVE, true, -1, 20).subscribe( (result: IProduct[]) => {
-        result.map((item: IProduct) => {
-          this.items.push({
-            id: item.id,
-            title: item.name,
-            description: item.description,
-            background: item.img,
-            url: ''
-          });
-        });
-    });
-    // this.items = carouselItems;
+    return itemsValues;
   }
 }

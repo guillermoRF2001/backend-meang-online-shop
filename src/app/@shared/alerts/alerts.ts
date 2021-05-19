@@ -95,3 +95,19 @@ export async function optionsWithDetails(
     }
   });
 }
+
+export const loadData = (title: string, html: string) => {
+  Swal.fire({
+    allowOutsideClick: false,
+    title,
+    html,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+};
+
+export const closeAlert = () => {
+  Swal.close();
+};

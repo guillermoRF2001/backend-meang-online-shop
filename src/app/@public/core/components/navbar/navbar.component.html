@@ -20,6 +20,15 @@
           >Home</a
         >
       </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown">Filtro</a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: #2b2f33;">
+          <a routerLinkActive="router-link-active" *ngFor="let item of menuItems">
+            <a class="nav-link" [routerLink]="item.url">{{item.label}}</a>
+          <div class="dropdown-divider" style="border-top: 1px solid #4c4d4e;"></div>
+          </a>
+        </div>
+      </li>
       <li class="nav-item">
         <a
           class="nav-link"
