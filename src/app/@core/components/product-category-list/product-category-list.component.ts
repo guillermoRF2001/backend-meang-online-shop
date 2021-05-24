@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, Input } from '@angular/core';
 import { IProduct } from '@mugan86/ng-shop-ui/lib/interfaces/product.interface';
 
@@ -11,7 +12,7 @@ export class ProductCategoryListComponent {
   @Input() productsList: Array<IProduct> = [];
   @Input() description = '';
 
-  constructor() { }
+  constructor(private router: Router) { }
 
   addToCart($event: IProduct){
     console.log('Add to cart', $event);
@@ -19,6 +20,7 @@ export class ProductCategoryListComponent {
 
   showProductDetails($event: IProduct){
     console.log('show details', $event);
+    this.router.navigate(['/games/details', +$event.id]);
   }
 
 }

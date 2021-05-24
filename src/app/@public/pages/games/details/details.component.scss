@@ -1,0 +1,56 @@
+.container {
+    margin-top: 10px;
+}
+
+.mini {
+    margin-bottom: 10px;
+}
+
+.mini:hover {
+    cursor: pointer;
+    opacity: 85%;
+}
+
+.productImformation {
+    margin-top: 50px;
+}
+
+/** Estilos de los precios **/
+
+.price {
+    font-size: 22px;
+    font-weight: 800;
+    color: #cc1c39;
+    text-align: left;
+    margin-left: 5px;
+    margin-bottom: 12px;
+}
+
+.price span {
+    font-size: 18px;
+    font-weight: 400;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.price span.discount-pecentage{
+    text-decoration: none;
+}
+
+.main-img, .more-games{
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+.more-games {
+    max-height: 110px;
+}
+
+@media(max-width: 760px){
+    #screen-section {
+        display: none;
+    }
+}
