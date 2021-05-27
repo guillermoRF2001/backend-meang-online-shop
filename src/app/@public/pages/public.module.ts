@@ -1,3 +1,4 @@
+import { ShoppingCartModule } from '@shop/core/components/shopping-cart/shopping-cart.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +14,8 @@ import { FooterComponent } from '@shop-core/components/footer/footer.component';
   declarations: [PublicComponent, HeaderComponent, NavbarComponent, FooterComponent],
   imports: [
     CommonModule,
-    PublicRoutingModule
+    PublicRoutingModule,
+    ShoppingCartModule
   ]
 })
 export class PublicModule { }

@@ -1,3 +1,4 @@
+import { CartService } from './../../services/cart.service.ts.service';
 import { IMeData } from '@core/interfaces/session.interface';
 import { AuthService } from '@core/services/auth.service';
 import { Component, OnInit } from '@angular/core';
@@ -18,7 +19,7 @@ export class NavbarComponent implements OnInit {
   userLabel = '';
   userLabelComplete = '';
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private cartCervice: CartService) {
     // tslint:disable-next-line: deprecation
     this.authService.accessVar$.subscribe((result) => {
       this.session = result;
@@ -30,6 +31,11 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  open(){
+    console.log('abrir');
+    this.cartCervice.open();
   }
 
   logout(){

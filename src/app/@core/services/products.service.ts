@@ -30,10 +30,10 @@ export class ProductsService extends ApiService {
       console.log('home', result);
       return {
         carousel: result.carousel,
-        ps3: this.manageInfo(result.ps3.shopProducts),
-        pc: this.manageInfo(result.pc.shopProducts),
-        topPrice: this.manageInfo(result.topPrice35.shopProducts),
-        android: this.manageInfo(result.android.shopProducts),
+        ps3: this.manageInfo(result.ps3.shopProducts, true),
+        pc: this.manageInfo(result.pc.shopProducts, true),
+        topPrice: this.manageInfo(result.topPrice35.shopProducts, true),
+        android: this.manageInfo(result.android.shopProducts, true),
       };
     }));
   }
