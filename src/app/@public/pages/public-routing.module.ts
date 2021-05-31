@@ -33,6 +33,10 @@ const routes: Routes = [
         loadChildren: () => import('./forms/register/register.module').then(m => m.RegisterModule)
       },
       {
+        path: 'checkout',
+        loadChildren: () => import('./forms/checkout/checkout.module').then(m => m.CheckoutModule)
+      },
+      {
         path: 'active/:token',
         loadChildren: () => import('./forms/active/active.module').then(m => m.ActiveModule)
       },

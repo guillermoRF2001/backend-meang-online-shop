@@ -1,3 +1,6 @@
+import { ICart } from './../shopping-cart/shopping-cart.interface';
+import { Router } from '@angular/router';
+import { REDIRECTS_ROUTES } from './../../../../@core/constants/config';
 import { CartService } from './../../services/cart.service.ts.service';
 import { IMeData } from '@core/interfaces/session.interface';
 import { AuthService } from '@core/services/auth.service';
@@ -10,6 +13,7 @@ import { IMenuItem } from '@core/interfaces/menu-item.interface';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
+  cartItemsTotal: number;
   menuItems: Array<IMenuItem> = shopMenuItems;
   session: IMeData = {
     status: false,
@@ -19,7 +23,7 @@ export class NavbarComponent implements OnInit {
   userLabel = '';
   userLabelComplete = '';
 
-  constructor(private authService: AuthService, private cartCervice: CartService) {
+  constructor(private authService: AuthService, private cartService: CartService, private router: Router) {
     // tslint:disable-next-line: deprecation
     this.authService.accessVar$.subscribe((result) => {
       this.session = result;
@@ -28,17 +32,29 @@ export class NavbarComponent implements OnInit {
       this.userLabel = `${ this.session.user?.name }`;
       this.userLabelComplete = `${ this.session.user?.name } ${ this.session.user?.lastname }`;
     });
+
+    this.cartService.itemsVar$.subscribe((data: ICart) => {
+      if (data !== undefined && data !== null) {
+        this.cartItemsTotal = data.subtotal;
+      }
+    });
   }
 
   ngOnInit(): void {
+    this.cartItemsTotal = this.cartService.initialize().subtotal;
   }
 
   open(){
     console.log('abrir');
-    this.cartCervice.open();
+    this.cartService.open();
   }
 
   logout(){
+    // rutas que usaremos para rediccionar.
+    if (REDIRECTS_ROUTES.includes(this.router.url)) {
+    // En el caso de encontrarla marcamos para la redireccion.
+    localStorage.setItem('route_after_login', this.router.url);
+  }
     this.authService.resetSession();
   }
 

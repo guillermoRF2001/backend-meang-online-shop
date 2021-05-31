@@ -1,3 +1,5 @@
+import { ICart } from './../../../core/components/shopping-cart/shopping-cart.interface';
+import { CartService } from './../../../core/services/cart.service.ts.service';
 import { CURRENCY_SELECT } from '@core/constants/config';
 import { ProductsService } from '@core/services/products.service';
 import { Component, OnInit } from '@angular/core';
@@ -21,22 +23,36 @@ export class DetailsComponent implements OnInit {
   loading: boolean;
   constructor(
     private productService: ProductsService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private cartService: CartService,
   ) {}
 
   ngOnInit() {
     this.activatedRoute.params.subscribe((params) => {
-      console.log('params', +params.id);
       loadData('Cargando datos', 'Espere por favor');
       this.loading = true;
       this.loadDataValue(+params.id);
     });
+
+    this.cartService.itemsVar$.subscribe((data: ICart) => {
+      if (data.subtotal === 0) {
+        this.product.qty = 1;
+        return;
+      }
+
+      this.product.qty = this.findProduct(+this.product.id).qty;
+    });
+  }
+
+  findProduct(id: number) {
+    return this.cartService.cart.products.find(item => +item.id === id);
   }
 
   loadDataValue(id: number){
     this.productService.getItem(id).subscribe((result) => {
-      console.log(result);
       this.product = result.product;
+      const saveProductInCart = this.findProduct(+this.product.id);
+      this.product.qty = (saveProductInCart !== undefined) ? saveProductInCart.qty : this.product.qty;
       this.selectImage = this.product.img;
       this.screens = result.screens;
       this.relationalProducts = result.relational;
@@ -47,15 +63,18 @@ export class DetailsComponent implements OnInit {
   }
 
   changeValue(qty: number) {
-    console.log(qty);
+    this.product.qty = qty;
   }
 
   selectOtherPlatform($event){
-    console.log($event.target.value);
     this.loadDataValue(+$event.target.value);
   }
 
   selectImgMain(i: number) {
     this.selectImage = this.screens[i];
+  }
+
+  addToCart() {
+    this.cartService.manageProduct(this.product);
   }
 }
