@@ -1,21 +1,22 @@
+import { UsersComponent } from '@admin/pages/users/users.component';
 import { adminAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
 import { AuthService } from '@core/services/auth.service';
 import { Injectable } from '@angular/core';
 import {
-  CanActivateChild,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   Router,
+  CanActivate,
 } from '@angular/router';
 import jwtDecode from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AdminGuard implements CanActivateChild {
+export class ShopGuard implements CanActivate {
   constructor(private auth: AuthService, private router: Router) {}
-  canActivateChild(
+  canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
@@ -29,13 +30,7 @@ export class AdminGuard implements CanActivateChild {
         adminAlert(TYPE_ALERT.WARNING, 'sesion caducada', 'Por favor vuelva a introducir el usuario.');
         return this.redirect();
       }
-      // Tercero comprobar que el role del usuario es ADMIN.
-      if (dataDecode.user.role === 'ADMIN'){
-        console.log('Soy administrador');
-        return true;
-      }
-      adminAlert(TYPE_ALERT.ERROR, 'No es administrador', 'Por favor introduzca un usuario que sea administrador.');
-      return this.redirect();
+      return true;
     }
     adminAlert(TYPE_ALERT.ERROR, 'Sesion no inicada', 'Por favor introduzca un usuario.');
     return this.redirect();

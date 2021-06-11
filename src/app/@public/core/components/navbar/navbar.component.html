@@ -71,7 +71,7 @@
           <p class="dropdown-full-name">{{ userLabelComplete }}</p>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#">Perfil</a>
-          <a class="dropdown-item" href="#">configuración</a>
+          <a class="dropdown-item" [routerLink]="['/orders']" routerLinkActive="router-link-active" >Pedidos</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" (click)="logout()">salir de la sesión</a>
         </div>

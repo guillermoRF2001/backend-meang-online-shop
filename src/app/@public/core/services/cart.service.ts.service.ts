@@ -31,6 +31,14 @@ export class CartService {
     return this.cart;
   }
 
+  orderDescription() {
+    let description = '';
+    this.cart.products.map((product: IProduct) => {
+      description += `${product.name} (${product.description}) x ${product.qty},\n`;
+    });
+    return description;
+  }
+
   public updateItemsInCart(newValue: ICart) {
     this.itemsVar.next(newValue);
   }
@@ -76,7 +84,8 @@ export class CartService {
     });
 
     this.cart.total = total;
-    this.cart.total = Math.round(this.cart.total * 100) / 100;
+    this.cart.total = (Math.round(this.cart.total * 100)) / 100;
+    console.log('total calculado', this.cart.total);
     this.cart.subtotal = subtotal;
     console.log(this.cart, 'calculado');
     this.setInfo();

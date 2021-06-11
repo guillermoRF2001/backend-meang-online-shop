@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ShopGuard } from '@core/guards/shop.guard';
 import { PublicComponent } from './public.component';
 
 
@@ -37,8 +38,14 @@ const routes: Routes = [
         loadChildren: () => import('./forms/checkout/checkout.module').then(m => m.CheckoutModule)
       },
       {
+        path: 'orders',
+        loadChildren: () => import('./orders/orders.module').then(m => m.OrdersModule),
+        canActivate: [ShopGuard]
+      },
+      {
         path: 'active/:token',
-        loadChildren: () => import('./forms/active/active.module').then(m => m.ActiveModule)
+        loadChildren: () => import('./forms/active/active.module').then(m => m.ActiveModule),
+        canActivate: [ShopGuard]
       },
       {
         path: 'forgot',
