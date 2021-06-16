@@ -50,6 +50,7 @@ export class DetailsComponent implements OnInit {
     this.productService.stockUpdateListener(id).subscribe(
       (result) => {
         console.log('Actualización', result);
+        this.product.stock = result.stock;
       }
     );
   }
