@@ -51,6 +51,14 @@ export class DetailsComponent implements OnInit {
       (result) => {
         console.log('Actualización', result);
         this.product.stock = result.stock;
+
+        if (this.product.qty > this.product.stock) {
+          this.product.qty = this.product.stock;
+        }
+
+        if (this.product.stock === 0) {
+          this.product.qty = 1;
+        }
       }
     );
   }
@@ -78,7 +86,10 @@ export class DetailsComponent implements OnInit {
   }
 
   selectOtherPlatform($event){
-    this.loadDataValue(+$event.target.value);
+    const id = +$event.target.value;
+    this.loadDataValue(id);
+    this.updateListener(id);
+    window.history.replaceState({}, '', `/#/games/details/${id}`);
   }
 
   selectImgMain(i: number) {
