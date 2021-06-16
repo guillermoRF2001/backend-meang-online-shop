@@ -32,6 +32,7 @@ export class DetailsComponent implements OnInit {
       loadData('Cargando datos', 'Espere por favor');
       this.loading = true;
       this.loadDataValue(+params.id);
+      this.updateListener(+params.id);
     });
 
     this.cartService.itemsVar$.subscribe((data: ICart) => {
@@ -42,6 +43,15 @@ export class DetailsComponent implements OnInit {
 
       this.product.qty = this.findProduct(+this.product.id).qty;
     });
+  }
+
+  updateListener(id: number) {
+    console.log('escuchando', id);
+    this.productService.stockUpdateListener(id).subscribe(
+      (result) => {
+        console.log('Actualización', result);
+      }
+    );
   }
 
   findProduct(id: number) {

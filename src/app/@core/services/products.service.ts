@@ -1,4 +1,4 @@
-import { SHOP_PRODUCT_DETAILS, SHOP_PRODUCT_RANDOM_ITEMS } from '@graphql/operations/query/shop-product';
+import { SHOP_PRODUCT_RANDOM_ITEMS } from '@graphql/operations/query/shop-product';
 import { HOME_PAGE } from '@graphql/operations/query/home-page';
 import { map } from 'rxjs/internal/operators/map';
 import {
@@ -11,6 +11,7 @@ import { Injectable } from '@angular/core';
 import { ACTIVE_FILTERS } from '@core/constants/filters';
 import { IProduct } from '@mugan86/ng-shop-ui/lib/interfaces/product.interface';
 import { DETAILS_PAGE } from '@graphql/operations/query/details-page';
+import { SUBSCRIPTIONS_PRODUCT_SELECT_STOCK } from '@graphql/operations/subscription/shop-product';
 
 @Injectable({
   providedIn: 'root',
@@ -144,5 +145,14 @@ export class ProductsService extends ApiService {
       resultList.push(this.setInObject(shopObject, showDescription));
     });
     return resultList;
+  }
+
+  stockUpdateListener(id: number) {
+    return this.subscription(
+      SUBSCRIPTIONS_PRODUCT_SELECT_STOCK,
+      { id }
+    ).pipe(map((result: any) => {
+      return result.selectProductStockUpdate;
+    }));
   }
 }
