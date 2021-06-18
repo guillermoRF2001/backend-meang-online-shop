@@ -1,3 +1,4 @@
+import { LABEL } from './../../core/constants/title.constants';
 import { ACTIVE_FILTERS } from '@core/constants/filters';
 import { basicAlert } from '@shared/alerts/toasts';
 import { GENRE_LIST_QUERY } from '@graphql/operations/query/genre';
@@ -8,6 +9,7 @@ import { ITableColumns } from '@core/interfaces/table-columns.interface';
 import { formBasicDialog, optionsWithDetails } from '@shared/alerts/alerts';
 import { GenresService } from './genres.service';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
+import { TitleService } from '@admin/core/services/title.service';
 
 @Component({
   selector: 'app-genres',
@@ -23,9 +25,10 @@ export class GenresComponent implements OnInit {
   columns: Array<ITableColumns>;
   filterActiveValues = ACTIVE_FILTERS.ACTIVE;
 
-  constructor(private service: GenresService) {}
+  constructor(private service: GenresService, private titleService: TitleService) {}
 
   ngOnInit(): void {
+    this.titleService.updateTitle(LABEL.GENRES);
     this.context = {};
     this.itemsPage = 15;
     this.resultData = {

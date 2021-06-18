@@ -6,6 +6,8 @@ import { LOGIN_QUERY, ME_DATA_QUERY } from '@graphql/operations/query/user';
 import { map } from 'rxjs/internal/operators/map';
 import { HttpHeaders } from '@angular/common/http';
 import { Subject } from 'rxjs';
+import { REDIRECTS_ROUTES } from '@core/constants/config';
+import { optionsWithDetails } from '@shared/alerts/alerts';
 
 @Injectable({
   providedIn: 'root'
@@ -80,7 +82,22 @@ export class AuthService extends ApiService{
     return JSON.parse(localStorage.getItem('session'));
   }
 
-  resetSession() {
+  async resetSession(routesUrl: string = '') {
+    const result = await optionsWithDetails(
+      'Cerrar sesión',
+      `¿Estás seguro que quieres cerrar la sesión?`,
+      400,
+      'Si, cerrar', // true
+      'No'
+    ); // false
+    if (!result) {
+      return;
+    }
+    // rutas que usaremos para redireccionar
+    if (REDIRECTS_ROUTES.includes(routesUrl)) {
+      // En el caso de encontrarla marcamos para que redireccione
+      localStorage.setItem('route_after_login', routesUrl);
+    }
     localStorage.removeItem('session');
     this.updateSession({status: false});
   }

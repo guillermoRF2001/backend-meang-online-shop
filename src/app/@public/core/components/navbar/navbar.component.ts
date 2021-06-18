@@ -50,12 +50,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(){
-    // rutas que usaremos para rediccionar.
-    if (REDIRECTS_ROUTES.includes(this.router.url)) {
-    // En el caso de encontrarla marcamos para la redireccion.
-    localStorage.setItem('route_after_login', this.router.url);
-  }
-    this.authService.resetSession();
+    this.authService.resetSession(this.router.url);
   }
 
 }

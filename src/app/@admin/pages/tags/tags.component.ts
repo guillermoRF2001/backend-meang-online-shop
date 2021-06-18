@@ -8,6 +8,8 @@ import { optionsWithDetails, formBasicDialog } from '@shared/alerts/alerts';
 import { basicAlert } from '@shared/alerts/toasts';
 import { TYPE_ALERT } from '@shared/alerts/values.config';
 import { ACTIVE_FILTERS } from '@core/constants/filters';
+import { TitleService } from '@admin/core/services/title.service';
+import { LABEL } from '@admin/core/constants/title.constants';
 
 @Component({
   selector: 'app-tags',
@@ -24,9 +26,10 @@ export class TagsComponent implements OnInit {
   columns: Array<ITableColumns>;
   filterActiveValues = ACTIVE_FILTERS.ACTIVE;
 
-  constructor(private service: TagsService) {}
+  constructor(private service: TagsService, private titleService: TitleService) {}
 
   ngOnInit(): void {
+    this.titleService.updateTitle(LABEL.TAGS);
     this.context = {};
     this.itemsPage = 15;
     this.resultData = {
