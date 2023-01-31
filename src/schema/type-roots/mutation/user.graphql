@@ -1,0 +1,8 @@
+"Sirve para subir a la base de datos los distintos usuarios."
+type Mutation {
+    "Apartado de usuarios"
+    register(user: UserInput!): ResultUser
+    updateUser(user: UserInput!): ResultUser
+    deleteUser(id: ID!): ResultUser
+    blockUser(id: ID!, unblock: Boolean = false, admin: Boolean = false): ResultUser
+}

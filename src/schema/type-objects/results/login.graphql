@@ -1,0 +1,12 @@
+
+"Nos da la informacion del usuario con el que has logueado."
+type ResultLogin implements Result {
+    "Estado de la operación."
+    status: Boolean!
+    "Mensaje de la operación para dar feedback."
+    message: String!
+    "Informacion del token usuario logeado."
+    token: String
+    "Información del usuario."
+    user: User
+}

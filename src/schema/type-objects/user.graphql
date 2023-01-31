@@ -1,0 +1,24 @@
+
+"Para especificar la informacion detallada del usuario como el formato."
+type User {
+    "Identificador único."
+    id: ID!
+    "Nombre de pila."
+    name: String!
+    "Apellido/s."
+    lastname: String!
+    "Correo electrónico."
+    email: String!
+    "Contraseña de la cuenta."
+    password: String!
+    "Fecha de registro en la base de datos."
+    registerDate: String!
+    "Fecha de nacimiento - Solo mayores de 18 años."
+    birthday: String!
+    "Permisos de usuario."
+    role: Role!
+    "Permiso de bloqueo"
+    active: Boolean
+    "Cliente de Stripe"
+    stripeCustomer: String
+}

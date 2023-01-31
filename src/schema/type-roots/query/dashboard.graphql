@@ -1,0 +1,4 @@
+  
+type Query {
+    totalElements(collection: String!): Int
+}

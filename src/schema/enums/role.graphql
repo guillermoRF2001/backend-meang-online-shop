@@ -1,0 +1,6 @@
+
+"Indica si el usuario es Administrador o Cliente."
+enum Role {
+    CLIENT
+    ADMIN
+}

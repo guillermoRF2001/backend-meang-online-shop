@@ -1,0 +1,7 @@
+type Mutation {
+    "Apartado de genero"
+    addGenre(genre: String!): ResultGenre
+    updateGenre(id: ID!, genre: String!): ResultGenre
+    deleteGenre(id: ID!): ResultGenre
+    blockGenre(id: ID!, unblock: Boolean = false): ResultGenre
+}

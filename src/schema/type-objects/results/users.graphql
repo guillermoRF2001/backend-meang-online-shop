@@ -1,0 +1,25 @@
+
+"Indica si ha cargado correctamente la lista y si carga te la muestra."
+type ResultUsers implements Result {
+    "Mostrar informacion del sistema de paginacion."
+    info: ResultInfo
+    "Estado de la operación."
+    status: Boolean!
+    "Mensaje de la operación para dar feedback."
+    message: String!
+    "Lista de usuarios registrados en la base de datos."
+    users: [User!]!
+}
+
+"""
+Indica si ha cargado correctamente el usuario con el que hemos logueado 
+y nos muestra informacion sobre el usuario.
+"""
+type ResultUser implements Result {
+    "Estado de la operación."
+    status: Boolean!
+    "Mensaje de la operación para dar feedback."
+    message: String!
+    "Informacion del usuario."
+    user: User
+}
